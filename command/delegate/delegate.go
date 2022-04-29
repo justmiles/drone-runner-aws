@@ -130,9 +130,9 @@ func (c *delegateCommand) run(*kingpin.ParseContext) error {
 		cancel()
 	})
 
-	store := database.ProvideInstanceStore(db)
+	instanceStore := database.ProvideInstanceStore(db)
 	c.stageOwnerStore = database.NewStageOwnerStore(db)
-	c.poolManager = drivers.New(ctx, store, c.liteEnginePath, c.runnerName)
+	c.poolManager = drivers.New(ctx, instanceStore, c.liteEnginePath, c.runnerName)
 
 	poolFile, err := config.ParseFile(c.pool)
 	if err != nil {
@@ -279,11 +279,11 @@ func (c *delegateCommand) handlePoolOwner(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	stageId := r.URL.Query().Get("stageId")
-	if stageId != "" {
-		_, err := c.stageOwnerStore.Find(context.Background(), stageId, poolName)
+	stageID := r.URL.Query().Get("stageId")
+	if stageID != "" {
+		_, err := c.stageOwnerStore.Find(context.Background(), stageID, poolName)
 		if err != nil {
-			logrus.WithError(err).WithField("pool", poolName).WithField("stageId", stageId).Trace("failed to find the stage in store")
+			logrus.WithError(err).WithField("pool", poolName).WithField("stageId", stageID).Trace("failed to find the stage in store")
 			httprender.OK(w, poolOwnerResponse{Owner: false})
 			return
 		}
