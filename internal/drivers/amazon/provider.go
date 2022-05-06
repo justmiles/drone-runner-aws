@@ -79,7 +79,9 @@ func New(opts ...Option) (drivers.Driver, error) {
 		if p.accessKeyID != "" && p.secretAccessKey != "" {
 			config.Credentials = credentials.NewStaticCredentials(p.accessKeyID, p.secretAccessKey, "")
 		}
-		mySession := session.Must(session.NewSession())
+		mySession := session.Must(session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable,
+		}))
 		p.service = ec2.New(mySession, config)
 	}
 	return p, nil
